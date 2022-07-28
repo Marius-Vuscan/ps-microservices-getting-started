@@ -1,11 +1,12 @@
-using System;
-using GloboTicket.Web.Services;
+using GloboTicket.Grpc;
 using GloboTicket.Web.Models;
+using GloboTicket.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace GloboTicket.Web
 {
@@ -27,10 +28,13 @@ namespace GloboTicket.Web
             if (environment.IsDevelopment())
                 builder.AddRazorRuntimeCompilation();
 
-            services.AddHttpClient<IEventCatalogService, EventCatalogService>(c => 
+            services.AddHttpClient<IEventCatalogService, EventCatalogService>(c =>
                 c.BaseAddress = new Uri(config["ApiConfigs:EventCatalog:Uri"]));
-            services.AddHttpClient<IShoppingBasketService, ShoppingBasketService>(c => 
+            services.AddHttpClient<IShoppingBasketService, ShoppingBasketService>(c =>
                 c.BaseAddress = new Uri(config["ApiConfigs:ShoppingBasket:Uri"]));
+
+            services.AddGrpcClient<Events.EventsClient>(
+                o => o.Address = new Uri(config["ApiConfigs:EventCatalog:Uri"]));
 
             services.AddSingleton<Settings>();
         }
